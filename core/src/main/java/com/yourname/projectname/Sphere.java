@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.*;
 
@@ -32,13 +33,35 @@ public class Sphere{
         mb.begin();
         mb.node().id = "coin";
         mb.part("sphere", GL20.GL_TRIANGLES, Usage.Position | 
-            Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.YELLOW))).sphere(width, height, depth, 10, 10);
+            Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.YELLOW))).sphere(1f, 1f, 1f, 10, 10);
         model = mb.end();
         myModel = new ModelInstance(model, "coin");
-        myModel.transform.setToTranslation(width, height, depth);
+        myModel.transform.setToTranslation(x, y, z);
+        myObject = new btCollisionObject();
+        myObject.setCollisionShape(myShape);
+        myObject.setWorldTransform(myModel.transform);
     }
 
     public ModelInstance getModel(){
         return myModel;
     }
+
+    public btCollisionObject getObject(){
+        return myObject;
+    }
+
+    public void move(float x, float y, float z){
+        myModel.transform.translate(x, y, z);
+        myObject.setWorldTransform(myModel.transform);
+    }
+
+    public Vector3 getVector(){
+        Vector3 position = new Vector3();
+        myModel.transform.getTranslation(position);
+        return position;
+    }
 }
+
+        //ballObject = new btCollisionObject();
+        //ballObject.setCollisionShape(ballShape);
+        //ballObject.setWorldTransform(ball.transform);
