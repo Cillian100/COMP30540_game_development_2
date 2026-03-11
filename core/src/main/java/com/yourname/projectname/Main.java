@@ -5,7 +5,6 @@ import com.badlogic.gdx.ApplicationListener;
 public class Main implements ApplicationListener{
     int currentLevel=0;
     StartingScreen startingScreen = new StartingScreen();
-    LoadingLevelScreen loadingLevelScreen = new LoadingLevelScreen();
     Level_1 level_1;
     Level_2 level_2;
     Level_3 level_3;

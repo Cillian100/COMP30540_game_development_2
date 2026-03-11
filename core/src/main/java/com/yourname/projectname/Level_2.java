@@ -11,6 +11,8 @@ public class Level_2 extends Level_Master implements ApplicationListener{
         groundBox_2 = new Box(10f, 3f, 0f, 10f, 0.5f, 5f);
         instances.add(groundBox.getModel());
         instances.add(groundBox_2.getModel());
+        groundArray.add(groundBox);
+        groundArray.add(groundBox_2);
     }
 
     @Override
@@ -25,9 +27,6 @@ public class Level_2 extends Level_Master implements ApplicationListener{
     public void render() {
         input();
         masterRender();
-
-        groundCollision=checkCollision(ballPlayer.getObject(), groundBox.getObject()) 
-                        || checkCollision(ballPlayer.getObject(), groundBox_2.getObject());
     }
 
     @Override

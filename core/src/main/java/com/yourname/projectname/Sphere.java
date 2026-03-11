@@ -15,8 +15,10 @@ import com.badlogic.gdx.physics.bullet.collision.*;
 public class Sphere{
     btCollisionShape myShape;
     btCollisionObject myObject;
+    ModelBuilder modelBuilder;
     Model model;
     ModelInstance myModel;
+    ModelBuilder mb;
     float x, y, z, width, height, depth;
 
     public Sphere(float x, float y, float z, float width, float height, float depth){
@@ -28,18 +30,7 @@ public class Sphere{
         this.depth=depth;
         Bullet.init();
         myShape = new btSphereShape(0.5f);
-        ModelBuilder mb = new ModelBuilder();
-        
-        mb.begin();
-        mb.node().id = "coin";
-        mb.part("sphere", GL20.GL_TRIANGLES, Usage.Position | 
-            Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.YELLOW))).sphere(1f, 1f, 1f, 10, 10);
-        model = mb.end();
-        myModel = new ModelInstance(model, "coin");
-        myModel.transform.setToTranslation(x, y, z);
-        myObject = new btCollisionObject();
-        myObject.setCollisionShape(myShape);
-        myObject.setWorldTransform(myModel.transform);
+
     }
 
     public ModelInstance getModel(){
@@ -61,7 +52,3 @@ public class Sphere{
         return position;
     }
 }
-
-        //ballObject = new btCollisionObject();
-        //ballObject.setCollisionShape(ballShape);
-        //ballObject.setWorldTransform(ball.transform);

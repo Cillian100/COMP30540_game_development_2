@@ -13,21 +13,25 @@ public class Level_1 extends Level_Master implements ApplicationListener{
     ModelInstance ball;
     btCollisionShape ballShape;
     btCollisionObject ballObject;
-    Sphere coin;
+    Coin coin;
     Box groundBox_3, groundBox_2, groundBox_1, end_of_level;
 
     @Override
     public void create() {
-        coin = new Sphere(1f, 2f, 2.5f, 1f, 1f, 1f);
+        coin = new Coin(1f, 2f, 2.5f, 1f, 1f, 1f);
         groundBox_3 = new Box(20f, 0f, 0f, 10f, 0.5f, 5f);
         groundBox_2 = new Box(10f, 0f, 0f, 10f, 0.5f, 5f);
         groundBox_1 = new Box(0f, 0f, 0f,10f, 0.5f, 5f);
+        groundArray.add(groundBox_1);
+        groundArray.add(groundBox_2);
+        groundArray.add(groundBox_3);
         end_of_level = new Box(25f, 0f, 0f, 2f, 5f, 5f);
         upwardsMomentum=0;
 
         ballShape = new btSphereShape(0.5f);
         
         instances.add(coin.getModel());
+        instances.add(player.getModel());
         instances.add(groundBox_1.getModel());
         instances.add(groundBox_3.getModel());
         instances.add(groundBox_2.getModel());
@@ -42,12 +46,8 @@ public class Level_1 extends Level_Master implements ApplicationListener{
     public void render() {
         input();
         masterRender();
-        
-        groundCollision=checkCollision(ballPlayer.getObject(), groundBox_1.getObject())
-            || checkCollision(ballPlayer.getObject(), groundBox_2.getObject())  
-            || checkCollision(ballPlayer.getObject(), groundBox_3.getObject()); 
-        
-        endOfLevelCollision=checkCollision(ballPlayer.getObject(), end_of_level.getObject());
+    
+        endOfLevelCollision=checkCollision(player.getObject(), end_of_level.getObject());
     }
 
     public void input(){

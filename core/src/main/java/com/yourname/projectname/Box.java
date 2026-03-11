@@ -54,6 +54,10 @@ public class Box{
     public btCollisionShape getShape(){
         return myShape;
     }
+
+    public float getTop(){
+        return y+height;
+    }
 }
 
 

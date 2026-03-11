@@ -1,4 +1,8 @@
 background.png
+data/ship.g3db
+data/ship.mtl
+data/ship.obj
+data/ship.png
 level_1.png
 level_2.png
 level_3.png
