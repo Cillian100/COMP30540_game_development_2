@@ -1,4 +1,4 @@
-package com.yourname.projectname;
+package com.yourname.projectname.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.*;
+import com.yourname.projectname.CollisionDetection;
 
 public class Box{
     btCollisionShape myShape;
@@ -18,6 +19,7 @@ public class Box{
     Model model;
     ModelInstance myModel;
     float x, y, z, width, height, depth;
+    Vector3 zeroVector;
 
     public Box(float x, float y, float z, float width, float height, float depth){
         this.x=x;
@@ -40,6 +42,20 @@ public class Box{
         myObject = new btCollisionObject();
         myObject.setCollisionShape(myShape);
         myObject.setWorldTransform(myModel.transform);
+        zeroVector = new Vector3(0f, 0f, 0f);
+    }
+
+    public boolean booleanDetectPlayer(Player player, CollisionDetection collisionDetection){
+        return collisionDetection.checkCollision(player.getObject(), getCollisionObject());
+    }
+    
+    public void move(float x, float y, float z){
+        myModel.transform.translate(x, y, z);
+        myObject.setWorldTransform(myModel.transform);
+    }
+
+    public btCollisionObject getCollisionObject(){
+        return myObject;
     }
 
     public ModelInstance getModel(){
@@ -58,9 +74,28 @@ public class Box{
     public float getTop(){
         return y+height;
     }
+
+    public float getXAndWidth(){
+        return getX() + myModel.transform.getScaleX();
+    }
+
+    public float getX(){
+        return myModel.transform.getTranslation(zeroVector).x;
+    }
+
+    public float getYAndHeight(){
+        return getY() + myModel.transform.getScaleY();
+    }
+
+    public float getY(){
+        return myModel.transform.getTranslation(zeroVector).y;
+    }
+
+    public float getZAndDepth(){
+        return getZ() + myModel.transform.getScaleZ();
+    }
+
+    public float getZ(){
+        return myModel.transform.getTranslation(zeroVector).z;
+    }
 }
-
-
-       // groundObject = new btCollisionObject();
-       // groundObject.setCollisionShape(groundShape);
-       // groundObject.setWorldTransform(ground.transform);

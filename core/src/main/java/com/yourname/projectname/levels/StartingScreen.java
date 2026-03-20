@@ -1,4 +1,4 @@
-package com.yourname.projectname;
+package com.yourname.projectname.levels;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -31,6 +31,7 @@ public class StartingScreen implements ApplicationListener{
     int previousFrames=0;
     int currentLevel=0;
     boolean loadLevel=false;
+    boolean created=false;
 
     @Override
     public void create() {
@@ -53,6 +54,11 @@ public class StartingScreen implements ApplicationListener{
         pixmap.dispose();
 
         drawer = new ShapeDrawer(batch, new TextureRegion(pixelTexture, 0, 0, 1, 1));
+        created=true;
+    }
+
+    public boolean getCreated(){
+        return created;
     }
 
     @Override

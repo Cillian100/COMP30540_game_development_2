@@ -1,12 +1,8 @@
-package com.yourname.projectname;
+package com.yourname.projectname.entities;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Material;
+
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
@@ -20,6 +16,7 @@ public class Sphere{
     ModelInstance myModel;
     ModelBuilder mb;
     float x, y, z, width, height, depth;
+    Vector3 zeroVector;
 
     public Sphere(float x, float y, float z, float width, float height, float depth){
         this.x=x;
@@ -30,7 +27,16 @@ public class Sphere{
         this.depth=depth;
         Bullet.init();
         myShape = new btSphereShape(0.5f);
+        zeroVector = new Vector3(0f, 0f, 0f);
 
+    }
+
+
+    public float getX(){
+        return myModel.transform.getTranslation(zeroVector).x;
+    }
+    public float getXAndRadius(){
+        return getX() + 0.5f;
     }
 
     public ModelInstance getModel(){

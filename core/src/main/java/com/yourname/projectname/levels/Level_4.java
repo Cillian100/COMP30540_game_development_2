@@ -1,8 +1,7 @@
-package com.yourname.projectname;
+package com.yourname.projectname.levels;
 
-import com.badlogic.gdx.ApplicationListener;
 
-public class Level_4 extends Level_Master implements ApplicationListener{
+public class Level_4 extends Level_Master{
     @Override
     public void create() {
     }
