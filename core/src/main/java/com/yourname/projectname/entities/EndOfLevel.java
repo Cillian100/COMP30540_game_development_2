@@ -3,6 +3,7 @@ package com.yourname.projectname.entities;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 
 public class EndOfLevel extends Box{
@@ -20,7 +21,7 @@ public class EndOfLevel extends Box{
         doneLoading();
 
         myModel = new ModelInstance(endOfLevelInstance);
-        myModel.transform.setToTranslation(x, y, z);
+        myModel.transform.setToTranslation(x, y, z).rotate(Vector3.Y, 90);
         myObject = new btCollisionObject();
         myObject.setCollisionShape(myShape);
         myObject.setWorldTransform(myModel.transform);
@@ -29,6 +30,7 @@ public class EndOfLevel extends Box{
     private void doneLoading(){
         endOfLevel = assets.get("data/endOfLevel.obj", Model.class);
         endOfLevelInstance = new ModelInstance(endOfLevel);
+        endOfLevelInstance.transform.setToRotation(Vector3.Y, 90).trn(0, 0, 6f);
         loading=false;
     }
     

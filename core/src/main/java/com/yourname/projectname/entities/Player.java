@@ -11,8 +11,8 @@ public class Player extends Box{
     private Array<ModelInstance> instances_poop = new Array<ModelInstance>();
     private AssetManager assets;
     private boolean powerUp;
-    private float verticalSpeed, verticalAcceleration, movementSpeed, powerUpValue;
-    private int powerUpSpeed=1;
+    private float verticalSpeed, verticalAcceleration, movementSpeed, powerUpValue, waitValue, groundLevel;
+    public int powerUpSpeed=1, health=10, immune;
     private Model ship;
     private ModelInstance shipInstance;
 
@@ -24,14 +24,51 @@ public class Player extends Box{
         doneLoading();
 
         myModel = new ModelInstance(ship);
-        myModel.transform.setToTranslation(x, y, z);
+        myModel.transform.setToTranslation(x, y, z).rotate(Vector3.Y, 270);
         myObject = new btCollisionObject();
         myObject.setCollisionShape(myShape);
         myObject.setWorldTransform(myModel.transform);
         verticalSpeed=0;
         verticalAcceleration=0;
-        movementSpeed=10;
+        movementSpeed=0;
         powerUpValue=0;
+        waitValue=0;
+        immune=0;
+        groundLevel=0;
+    }
+
+    public void setGroundLevel(float setter){
+        groundLevel=setter;
+    }
+
+    public void setHealth(int variable){
+        health=health-variable;
+    }
+
+    public void reduceHealth(){
+        health=health-1;
+    }
+
+    public int getImmunityValue(){
+        return immune;
+    }
+
+    public void reduceImmunity(){
+        if(immune>0){
+            immune=immune-1;
+        }
+    }
+
+    public int getHealth(){
+        return health;
+    }
+
+    public void setImmunity(int number){
+        immune=number;
+    }
+
+    public boolean getImmunity(){
+        return immune==0;
     }
 
     public float getPowerUpValue(){
@@ -40,6 +77,10 @@ public class Player extends Box{
 
     public void powerUpDecrease(float delta){
         powerUpValue=powerUpValue-(float)2*delta;
+    }
+
+    public void wait(float delta){
+        waitValue=waitValue+(float)delta;
     }
     
     public void setPowerUp(boolean trueOrFalse){
@@ -60,25 +101,29 @@ public class Player extends Box{
         }
     }
 
+    public void bounceBack(){
+        movementSpeed=-5;
+    }
+
     public void horizontalMovement(boolean forward, boolean backwards, boolean rightSide, boolean leftSide, float delta){
+        if(movementSpeed<10){
+            movementSpeed=movementSpeed+0.1f;
+        }
         if(powerUpValue>0){
             powerUpSpeed=2;
         }else{
             powerUpSpeed=1;
         }
-        
-        if(forward==true){
-            move(delta*movementSpeed*powerUpSpeed, 0f, 0f);
-        }
-        if(backwards==true){
-            move(-delta*movementSpeed*powerUpSpeed, 0f, 0f);
-        }
+
         if(rightSide==true){
-            move(0f, 0f, delta*movementSpeed);
+            move(0f, 0f, delta*10);
         }
+
         if(leftSide==true){
-            move(0f, 0f, delta*-movementSpeed);
+            move(0f, 0f, -delta*10);
         }
+
+        move(delta*movementSpeed*powerUpSpeed, 0f, 0f);
     }
 
     public void verticalMovement(float delta){
@@ -94,7 +139,7 @@ public class Player extends Box{
     private void doneLoading(){
         ship = assets.get("data/ship.obj", Model.class);
         shipInstance = new ModelInstance(ship);
-        shipInstance.transform.setToRotation(Vector3.Y, 90).trn(0, 0, 6f);
+        shipInstance.transform.setToRotation(Vector3.Y, 180).trn(0f, 0f, 6f);
         instances_poop.add(shipInstance);
     }
 }

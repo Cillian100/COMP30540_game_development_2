@@ -1,7 +1,7 @@
 package com.yourname.projectname.levels;
 
+import java.util.ArrayList;
 import java.util.Vector;
-
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -24,10 +24,11 @@ import com.yourname.projectname.CollisionDetection;
 import com.yourname.projectname.entities.Box;
 import com.yourname.projectname.entities.Coin;
 import com.yourname.projectname.entities.EndOfLevel;
+import com.yourname.projectname.entities.Enemy;
 import com.yourname.projectname.entities.Player;
 import com.yourname.projectname.entities.PowerUp;
 
-public class Level_Master  implements ApplicationListener{
+public abstract class Level_Master  implements ApplicationListener{
     Array<Box> groundArray;
     BitmapFont font;
     boolean forward, backwards, leftSide, rightSide, jump, groundCollision, endOfLevelCollision, currentCollision, nextLevel;
@@ -49,6 +50,9 @@ public class Level_Master  implements ApplicationListener{
     Vector<ModelInstance> instance;
     Vector<Coin> coinArray;
     Vector<PowerUp> powerUpArray;
+    ArrayList<Enemy> enemyVector;
+
+    abstract void childRender(float delta);
 
     @Override
     public void create() {
@@ -64,6 +68,7 @@ public class Level_Master  implements ApplicationListener{
         groundArray = new Array<Box>();
         coinArray = new Vector<Coin>();
         powerUpArray = new Vector<PowerUp>();
+        enemyVector = new ArrayList<Enemy>();
         modelBatch = new ModelBatch();
         enviroment = new Environment();
         enviroment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -99,51 +104,26 @@ public class Level_Master  implements ApplicationListener{
         }
     }
 
-    public void collisionWithGround(float delta){
-        groundCollision=false;
-        for(int a=0;a<groundArray.size;a++){
-            currentCollision = collisionDetection.checkCollision(player.getObject(), groundArray.get(a).getObject());
-            if(currentCollision==true){
-                groundLevel = groundArray.get(a).getTop();
-            }
-            groundCollision = groundCollision || currentCollision;
-        }
-        if(!groundCollision){
-            player.fall(delta);
-        }else{
-            player.hitTheGround(delta);
-        }
-
-        if(groundCollision==true && jump==true){
-            player.jump(delta);
-        }
-    }
-
     public void collisionWithEndOfLevel(){
         if(endOfLevel.booleanDetectPlayer(player, collisionDetection)){
             nextLevel=true;
         }
     }
 
-    public void collisionWithEnemy(){
-
-    }
-
     public void cameraPosition(){
-        cam.position.set(player.getX()-10, groundLevel+10f, player.getZ());
+        cam.position.set(player.getX(), 10f, player.getZ()-10);
         cam.lookAt(player.getX(), groundLevel, player.getZ());
         cam.update();
         Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 1.f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
     
-    public void masterRender(){
-        final float delta = Math.min(1f/30f, Gdx.graphics.getDeltaTime());
+    public void masterRender(float delta){
         if(hasCoins==true){
             collisionWithCoin();
         }
         if(hasGround==true){
-            collisionWithGround(delta);
+            groundCollision=collisionDetection.collisionWithGround(player, groundArray, delta);
         }
         if(hasPowerUp==true){
             collisionWithPowerUp();
@@ -152,7 +132,11 @@ public class Level_Master  implements ApplicationListener{
             collisionWithEndOfLevel();
         }
         if(hasEnemy==true){
-            collisionWithEnemy();
+            collisionDetection.collisionWithEnemy(player, enemyVector);
+        }
+
+        if(groundCollision==true && jump==true){
+            player.jump(delta);
         }
 
         player.horizontalMovement(forward, backwards, rightSide, leftSide, delta);
@@ -171,7 +155,7 @@ public class Level_Master  implements ApplicationListener{
         }
 
         font.draw(spriteBatch, "Score: " + score, 10, Gdx.graphics.getHeight() - 10);
-        font.draw(spriteBatch, "Health: " + health, 10, Gdx.graphics.getHeight() - 50);
+        font.draw(spriteBatch, "Health: " + (int)player.getHealth(), 10, Gdx.graphics.getHeight() - 50);
         font.draw(spriteBatch, "Power Up: " + (int)player.getPowerUpValue(), 10, Gdx.graphics.getHeight() - 90);
         spriteBatch.end();
     }
@@ -218,8 +202,10 @@ public class Level_Master  implements ApplicationListener{
 
     @Override
     public void render() {
+        final float delta = Math.min(1f/30f, Gdx.graphics.getDeltaTime());
         masterInput();
-        masterRender();
+        masterRender(delta);
+        childRender(delta);
     }
 
     @Override
@@ -233,5 +219,4 @@ public class Level_Master  implements ApplicationListener{
     @Override
     public void dispose() {
     }
-
 }

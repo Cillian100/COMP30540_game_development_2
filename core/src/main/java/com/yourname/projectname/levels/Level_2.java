@@ -21,4 +21,7 @@ public class Level_2 extends Level_Master{
         hasPowerUp=false;
         hasEnemy=false;
     }
+
+    public void childRender(float delta){
+    }
 }

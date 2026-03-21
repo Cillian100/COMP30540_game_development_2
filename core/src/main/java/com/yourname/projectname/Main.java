@@ -64,12 +64,30 @@ public class Main implements ApplicationListener{
         }
 
         if(level_3.getCreated()==false){
+            level_3.create();
+        }
+        level_3.render();
 
+        if(level_3.getNextLevel()==true){
+            currentLevel++;
+            level_3=null;
         }
     }
 
     public void level4(){
+        if(level_4==null){
+            level_4 = new Level_4();
+        }
 
+        if(level_4.getCreated()==false){
+            level_4.create();
+        }
+        level_4.render();
+
+        if(level_4.getNextLevel()==true){
+            currentLevel++;
+            level_4=null;
+        }
     }
 
 

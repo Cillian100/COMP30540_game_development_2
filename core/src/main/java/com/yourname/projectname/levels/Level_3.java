@@ -25,5 +25,8 @@ public class Level_3 extends Level_Master{
     @Override
     public void dispose() {
     }
+
+    public void childRender(float delta){
+    }
     
 }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.yourname.projectname.entities.Box;
 import com.yourname.projectname.entities.Coin;
 import com.yourname.projectname.entities.EndOfLevel;
+import com.yourname.projectname.entities.Enemy;
 import com.yourname.projectname.entities.PowerUp;
 
 public class Level_1 extends Level_Master{
@@ -17,24 +18,29 @@ public class Level_1 extends Level_Master{
     btCollisionObject ballObject;
     Coin coin;
     PowerUp powerUp;
+    Enemy enemy, enemy2;
     Box groundBox_3, groundBox_2, groundBox_1, end_of_level;
     //EndOfLevel endOfLevel;
 
     @Override
     public void create() {
         super.create();
-        coin = new Coin(15f, 0.5f, 1f, 1f, 1f, 1f);
-        powerUp = new PowerUp(17f, 0.5f, -1f, 1f, 1f, 1f);
-        groundBox_3 = new Box(30f, 0f, 0f, 10f, 0.5f, 5f);
-        groundBox_2 = new Box(15f, 0f, 0f, 10f, 0.5f, 5f);
-        groundBox_1 = new Box(0f, 0f, 0f,10f, 0.5f, 5f);
+        coin = new Coin(0f, 0.5f, 10f, 1f, 1f, 1f);
+        enemy = new Enemy(0f, 0.5f, 35f, 1f, 1f, 1f);
+        enemy2 = new Enemy(0f, 0.5f, 40f, 1f, 1f, 1f);
+        powerUp = new PowerUp(0f, 0.5f, 25f, 1f, 1f, 1f);
+        groundBox_3 = new Box(0f, 0f, 0f, 10f, 0.5f, 25f);
+        groundBox_2 = new Box(0f, 0f, 30f, 10f, 0.5f, 25f);
+        groundBox_1 = new Box(0f, 0f, 60f,10f, 0.5f, 25f);
+        endOfLevel = new EndOfLevel(0f, 0f, 70f, 5f, 5f, 2f);
         coinArray.add(coin);
         powerUpArray.add(powerUp);
+        enemyVector.add(enemy);
+        enemyVector.add(enemy2);
         groundArray.add(groundBox_1);
         groundArray.add(groundBox_2);
         groundArray.add(groundBox_3);
-        //end_of_level = new Box(35f, 0f, 0f, 2f, 5f, 5f);
-        endOfLevel = new EndOfLevel(35f, 0f, 0f, 2f, 5f, 5f);
+        
         upwardsMomentum=0;
 
         ballShape = new btSphereShape(0.5f);
@@ -46,11 +52,18 @@ public class Level_1 extends Level_Master{
         instance.add(groundBox_3.getModel());
         instance.add(groundBox_2.getModel());
         instance.add(endOfLevel.getModel());
+        instance.add(enemy.getModel());
+        instance.add(enemy2.getModel());
 
         hasCoins=true;
         hasEndOfLevel=true;
         hasPowerUp=true;
-        hasEnemy=false;
+        hasEnemy=true;
         hasGround=true;
-    }      
+    }
+    
+    public void childRender(float delta){
+        enemy.movementFunction1(-5f, 5f, delta, 3f);
+        enemy2.movementFunction1(-5f, 5f, delta, 5f);
+    }
 }

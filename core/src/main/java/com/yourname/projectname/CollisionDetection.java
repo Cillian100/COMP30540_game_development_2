@@ -1,5 +1,8 @@
 package com.yourname.projectname;
 
+import java.util.ArrayList;
+
+import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.physics.bullet.collision.CollisionObjectWrapper;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionAlgorithm;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
@@ -9,6 +12,10 @@ import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration
 import com.badlogic.gdx.physics.bullet.collision.btDispatcher;
 import com.badlogic.gdx.physics.bullet.collision.btDispatcherInfo;
 import com.badlogic.gdx.physics.bullet.collision.btManifoldResult;
+import com.badlogic.gdx.utils.Array;
+import com.yourname.projectname.entities.Box;
+import com.yourname.projectname.entities.Enemy;
+import com.yourname.projectname.entities.Player;
 
 public class CollisionDetection {
     btDispatcher dispatcher;
@@ -39,5 +46,37 @@ public class CollisionDetection {
         co1.dispose();
 
         return r;
+    }
+
+    public boolean collisionWithGround(Player player, Array<Box> groundVector, float delta){
+        boolean groundCollision=false;
+        boolean currentCollision;
+        for(int a=0;a<groundVector.size; a++){
+            currentCollision = checkCollision(player.getObject(), groundVector.get(a).getObject());
+            if(currentCollision==true){
+                player.setGroundLevel(groundVector.get(a).getTop());
+            }
+            groundCollision = groundCollision || currentCollision;
+        }
+
+        if(!groundCollision){
+            player.fall(delta);
+        }else{
+            player.hitTheGround(delta);
+        }
+
+        return groundCollision;
+    }
+
+    public void collisionWithEnemy(Player player, ArrayList<Enemy> enemyVector){
+        //System.out.println(player.getImmunityValue());
+        for(int a=0;a<enemyVector.size();a++){
+            if(checkCollision(player.getObject(), enemyVector.get(a).getObject()) && player.getImmunity()==true){
+                player.reduceHealth();
+                player.setImmunity(5);
+                player.bounceBack();
+            }
+        }
+        player.reduceImmunity();
     }
 }

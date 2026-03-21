@@ -114,7 +114,6 @@ public class StartingScreen implements ApplicationListener{
         if(Gdx.input.isKeyJustPressed(Keys.ENTER) && menuPosition==3){
             Gdx.app.exit();
         }
-        System.out.println(justOpenedLoadMenu);
 
         if(loadLevel && Gdx.input.isKeyJustPressed(Keys.ENTER) && menuPosition2==0 && !justOpenedLoadMenu){
             currentLevel=1;
