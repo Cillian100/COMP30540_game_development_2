@@ -10,11 +10,13 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObjectArray.less;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.yourname.projectname.logic.UserInput;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
@@ -32,13 +34,16 @@ public class StartingScreen implements ApplicationListener{
     int currentLevel=0;
     boolean loadLevel=false;
     boolean created=false;
+    int width, height;
+    UserInput userInput;
+    float[][] boxes;
 
     @Override
     public void create() {
         camera = new OrthographicCamera();
         batch = new SpriteBatch();
         font = new BitmapFont();
-        viewport = new FitViewport(20, 20, camera);
+        //viewport = new FitViewport(20, 20, camera);
         font.setUseIntegerPositions(false);
         backgroundTexture = new Texture("background.png");
         level_1 = new Texture("level_1.png");
@@ -55,6 +60,16 @@ public class StartingScreen implements ApplicationListener{
 
         drawer = new ShapeDrawer(batch, new TextureRegion(pixelTexture, 0, 0, 1, 1));
         created=true;
+        float aspectRatio = 9f / 16f;
+        viewport = new FitViewport(9, 16, camera);
+        width=9;
+        height=16;
+        userInput = new UserInput();
+        boxes = new float[4][4];
+        boxes[0] = new float[]{2, 5, 2, 2};
+        boxes[1] = new float[]{5, 5, 2, 2};
+        boxes[2] = new float[]{2, 2, 2, 2};
+        boxes[3] = new float[]{5, 2, 2, 2};
     }
 
     public boolean getCreated(){
@@ -62,70 +77,43 @@ public class StartingScreen implements ApplicationListener{
     }
 
     @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height, true);
+    public void resize(int thisWidth, int thisHeight) {
+        //System.out.println(thisWidth + " " + thisHeight);
+        viewport.update(thisWidth, thisHeight, true);
     }
 
     public void input(){
+        userInput.androidInput();
         boolean justOpenedLoadMenu=false;
 
         int currentFrames=frames;
-        if(Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S)){
-            if(currentFrames > previousFrames+10){
-                if(loadLevel){
-                    menuPosition2++;
-                    menuPosition2=menuPosition2%4;
-                }else{
-                    menuPosition++;
-                    menuPosition=menuPosition%4;
-                }
-                previousFrames=currentFrames;
-            }
+        if(!loadLevel){
+            menuPosition=userInput.keyBoardInput1(currentFrames, menuPosition, 4);
+            menuPosition=userInput.androidInput(currentFrames, menuPosition, 4, viewport);
+        }else{
+            menuPosition2=userInput.keyBoardInput1(currentFrames, menuPosition2, 4);
+            menuPosition2=userInput.androidInput2(currentFrames, menuPosition2, 4, viewport, boxes);
         }
 
-        if(Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W)){
-            if(currentFrames > previousFrames+10){
-                if(loadLevel){
-                    menuPosition2--;
-                    if(menuPosition2<0){
-                        menuPosition2=3;
-                    }
-                }else{
-                    menuPosition--;
-                    if(menuPosition<0){
-                        menuPosition=2;
-                    }
-                }
-                previousFrames=currentFrames;
-            }
-        }
-
-        if(Gdx.input.isKeyJustPressed(Keys.ENTER) && menuPosition==0){
+        if( (Gdx.input.isKeyJustPressed(Keys.ENTER) || Gdx.input.justTouched()) && menuPosition==0){
             currentLevel=1;
         }
-        if(Gdx.input.isKeyJustPressed(Keys.ENTER) && menuPosition==1){
+
+        if((Gdx.input.isKeyJustPressed(Keys.ENTER) || Gdx.input.justTouched()) && menuPosition==1){
             loadLevel=true;
             justOpenedLoadMenu=true;
             menuPosition=1;
         }
-        if(Gdx.input.isKeyJustPressed(Keys.ENTER) && menuPosition==2){
+
+        if((Gdx.input.isKeyJustPressed(Keys.ENTER) || Gdx.input.justTouched()) && menuPosition==2){
 
         }
-        if(Gdx.input.isKeyJustPressed(Keys.ENTER) && menuPosition==3){
+        if((Gdx.input.isKeyJustPressed(Keys.ENTER) || Gdx.input.justTouched()) && menuPosition==3){
             Gdx.app.exit();
         }
 
-        if(loadLevel && Gdx.input.isKeyJustPressed(Keys.ENTER) && menuPosition2==0 && !justOpenedLoadMenu){
-            currentLevel=1;
-        }
-        if(loadLevel && Gdx.input.isKeyJustPressed(Keys.ENTER) && menuPosition2==1){
-            currentLevel=2;
-        }
-        if(loadLevel && Gdx.input.isKeyJustPressed(Keys.ENTER) && menuPosition2==2){
-            currentLevel=3;
-        }
-        if(loadLevel && Gdx.input.isKeyJustPressed(Keys.ENTER) && menuPosition2==3){
-            currentLevel=4;
+        if(loadLevel){
+            currentLevel=userInput.loadOpenLevel(justOpenedLoadMenu, currentLevel, menuPosition2);
         }
 
         justOpenedLoadMenu=false;
@@ -142,69 +130,69 @@ public class StartingScreen implements ApplicationListener{
         viewport.apply();
         batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
-        batch.draw(backgroundTexture, 0, 0, 20, 20);
-        font.getData().setScale(viewport.getWorldHeight() / 100);
+        batch.draw(backgroundTexture, 0, 0, 9, 14);
+        font.getData().setScale(viewport.getWorldHeight() / 200);
         font.setColor(Color.WHITE);
-        font.draw(batch, "Space Runner", 0, 19f);
-        font.getData().setScale(viewport.getWorldHeight() / 150);
-        
+        font.draw(batch, "Space Runner", 0, 15.5f);
+        font.getData().setScale(viewport.getWorldHeight() / 200);
+
         if(menuPosition==0){
             font.setColor(Color.RED);
         }else{
             font.setColor(Color.WHITE);
         }
-        
-        font.draw(batch, "Start Game", 1, 16.5f);
-        
+
+        font.draw(batch, "Start Game", 1, 13f);
+
         if(menuPosition==1){
             font.setColor(Color.RED);
         }else{
             font.setColor(Color.WHITE);
         }
-        
-        font.draw(batch, "Load Level", 1, 15f);
-        
+
+        font.draw(batch, "Load Level", 1, 11f);
+
         if(menuPosition==2){
             font.setColor(Color.RED);
         }else{
             font.setColor(Color.WHITE);
         }
-        
-        font.draw(batch, "Settings", 1, 13.5f);
-        
+
+        font.draw(batch, "Settings", 1, 9f);
+
         if(menuPosition==3){
             font.setColor(Color.RED);
         }else{
             font.setColor(Color.WHITE);
         }
-        
-        font.draw(batch, "Exit", 1, 12f);
+
+        font.draw(batch, "Exit", 1, 7f);
 
         if(loadLevel==true){
             drawer.setColor(Color.BLACK);
-            drawer.filledRectangle(2,2,15,15);
+            drawer.filledRectangle(1,1,7,15);
 
             drawer.setColor(Color.RED);
             if(menuPosition2==0){
-                drawer.filledRectangle(3, 10, 6, 6);
+                drawer.filledRectangle(boxes[0][0]-0.1f, boxes[0][1]-0.1f, boxes[0][2]+0.2f, boxes[0][3]+0.2f);
             }
             if(menuPosition2==1){
-                drawer.filledRectangle(10, 10, 6, 6);
+                drawer.filledRectangle(boxes[1][0]-0.1f, boxes[1][1]-0.1f, boxes[1][2]+0.2f, boxes[1][3]+0.2f);
             }
             if(menuPosition2==2){
-                drawer.filledRectangle(3f, 3f, 6f, 6f);
+                drawer.filledRectangle(boxes[2][0]-0.1f, boxes[2][1]-0.1f, boxes[2][2]+0.2f, boxes[2][3]+0.2f);
             }
             if(menuPosition2==3){
-                drawer.filledRectangle(10, 3, 6, 6);
+                drawer.filledRectangle(boxes[3][0]-0.1f, boxes[3][1]-0.1f, boxes[3][2]+0.2f, boxes[3][3]+0.2f);
             }
-            batch.draw(level_1, 3.5f, 10.5f, 5f, 5f);
-            batch.draw(level_2, 10.5f, 10.5f, 5f, 5f);
-            batch.draw(level_3, 3.5f, 3.5f, 5f, 5f);
-            batch.draw(level_4, 10.5f, 3.5f, 5f, 5f);
+            batch.draw(level_1, boxes[0][0], boxes[0][1], boxes[0][2], boxes[0][3]);
+            batch.draw(level_2, boxes[1][0], boxes[1][1], boxes[1][2], boxes[1][3]);
+            batch.draw(level_3, boxes[2][0], boxes[2][1], boxes[2][2], boxes[2][3]);
+            batch.draw(level_4, boxes[3][0], boxes[3][1], boxes[3][2], boxes[3][3]);
         }
         batch.end();
         frames++;
-        
+
     }
 
     @Override

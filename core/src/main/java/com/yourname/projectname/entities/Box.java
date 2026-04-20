@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.*;
-import com.yourname.projectname.CollisionDetection;
+import com.yourname.projectname.logic.CollisionDetection;
 
 public class Box{
     btCollisionShape myShape;
@@ -31,10 +31,10 @@ public class Box{
         Bullet.init();
         myShape = new btBoxShape(new Vector3(width/2, 0.5f, depth/2));
         ModelBuilder mb = new ModelBuilder();
-        
+
         mb.begin();
         mb.node().id = "coin";
-        mb.part("box", GL20.GL_TRIANGLES, Usage.Position | 
+        mb.part("box", GL20.GL_TRIANGLES, Usage.Position |
             Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.RED))).box(width, height, depth);
         model = mb.end();
         myModel = new ModelInstance(model, "coin");
@@ -48,7 +48,7 @@ public class Box{
     public boolean booleanDetectPlayer(Player player, CollisionDetection collisionDetection){
         return collisionDetection.checkCollision(player.getObject(), getCollisionObject());
     }
-    
+
     public void move(float x, float y, float z){
         myModel.transform.translate(x, y, z);
         myObject.setWorldTransform(myModel.transform);

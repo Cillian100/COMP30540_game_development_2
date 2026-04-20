@@ -1,11 +1,30 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
 dependencies {
   api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
   api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
   implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
 
-
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
 }
+
+jar {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+
+//dependencies {
+//  api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
+//  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+//  api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+//  implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
+
+
+//  if(enableGraalNative == 'true') {
+//    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+//  }
+//}

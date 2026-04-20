@@ -1,4 +1,4 @@
-package com.yourname.projectname;
+package com.yourname.projectname.logic;
 
 import java.util.ArrayList;
 

@@ -1,6 +1,7 @@
 package com.yourname.projectname;
 
 import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
 import com.yourname.projectname.levels.Level_1;
 import com.yourname.projectname.levels.Level_2;
 import com.yourname.projectname.levels.Level_3;
@@ -14,9 +15,10 @@ public class Main implements ApplicationListener{
     Level_2 level_2;
     Level_3 level_3;
     Level_4 level_4;
+    int width=1090, height=1920;
 
     Test test;
-    
+
     @Override
     public void create() {
         startingScreen = new StartingScreen();
@@ -25,16 +27,17 @@ public class Main implements ApplicationListener{
     @Override
     public void resize(int width, int height) {
     }
-    
+
     public void level1(){
         if(level_1==null){
             level_1 = new Level_1();
         }
-        
+
         if(level_1.getCreated()==false){
             level_1.create();
         }
         level_1.render();
+        level_1.resize(1090, 1920);
 
         if(level_1.getNextLevel()==true){
             currentLevel++;
@@ -91,14 +94,14 @@ public class Main implements ApplicationListener{
     }
 
 
-    public void startingScreenFunction(){
+    public void startingScreenFunction(int width, int height){
         if(startingScreen==null){
             startingScreen = new StartingScreen();
         }
         if(startingScreen.getCreated()==false){
             startingScreen.create();
         }
-        startingScreen.resize(1000,1000);
+        startingScreen.resize(width, height);
         startingScreen.render();
 
         if(startingScreen.getCurrentLevel()!=0){
@@ -111,10 +114,11 @@ public class Main implements ApplicationListener{
     @Override
     public void render(){
         if(currentLevel==0){
-            startingScreenFunction();
+            startingScreenFunction(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         }
         if(currentLevel==1){
             level1();
+
         }
         if(currentLevel==2){
             level2();
@@ -176,5 +180,5 @@ public class Main implements ApplicationListener{
     //        level_4.dispose();
     //    }
     //}
-       
+
 }

@@ -13,7 +13,7 @@ public class Enemy extends Box{
         super(x, y, z, width, height, depth);
         ModelBuilder mb = new ModelBuilder();
         model = mb.createSphere(
-            1, 1, 1, 
+            1, 1, 1,
             10, 10,
             new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.BLUE)),
             Usage.Position | Usage.Normal
@@ -27,7 +27,7 @@ public class Enemy extends Box{
     }
 
     public void movementFunction1(float minX, float maxX, float delta, float speed){
-        System.out.println("poop " + getX() + " " + minX);
+        //System.out.println("poop " + getX() + " " + minX);
         if(getX()>maxX){
             direction1=-1;
         }

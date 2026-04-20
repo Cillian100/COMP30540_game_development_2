@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "gradle",
+            "task": "lwjgl3:run",
+            "label": "Run Desktop (LWJGL3)",
+            "projectPath": ".",
+            "group": "build"
+        }
+    ]
+}
