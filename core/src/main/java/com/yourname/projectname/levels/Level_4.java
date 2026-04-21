@@ -26,7 +26,7 @@ public class Level_4 extends Level_Master{
     public void dispose() {
     }
 
-    public void childRender(float delta){
+    public void childRender(float delta, int frames){
     }
     
 }

@@ -27,6 +27,7 @@ import com.yourname.projectname.entities.Coin;
 import com.yourname.projectname.entities.EndOfLevel;
 import com.yourname.projectname.entities.Enemy;
 import com.yourname.projectname.entities.Player;
+import com.yourname.projectname.entities.Skull;
 import com.yourname.projectname.entities.PowerUp;import com.yourname.projectname.logic.UserInput;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
@@ -38,7 +39,7 @@ public abstract class Level_Master  implements ApplicationListener{
     Array<Box> groundArray;
     BitmapFont font;
     boolean forward, backwards, leftSide, rightSide, jump, groundCollision, endOfLevelCollision, currentCollision, nextLevel;
-    boolean hasCoins, hasEndOfLevel, hasPowerUp, hasEnemy, hasGround;
+    boolean hasCoins, hasEndOfLevel, hasPowerUp, hasEnemy, hasGround, movementIllusion;
     boolean created=false;
     btCollisionConfiguration collisionConfig;
     btDispatcher dispatcher;
@@ -47,14 +48,15 @@ public abstract class Level_Master  implements ApplicationListener{
     EndOfLevel endOfLevel;
     Environment enviroment;
     FitViewport viewport;
-    float groundLevel, upwardsMomentum, powerUp=0;
-    int health=0, score=0;
+    float groundLevel, upwardsMomentum, powerUp=0, backgroundPosition=0;
+    int health=0, score=0, frames=0;
     PerspectiveCamera cam;
     ModelBatch modelBatch;
     Player player;
     SpriteBatch spriteBatch;
     Vector<ModelInstance> instance;
     Vector<Coin> coinArray;
+    Vector<Skull> skullArray;
     Vector<PowerUp> powerUpArray;
     ArrayList<Enemy> enemyVector;
     UserInput userInput;
@@ -62,9 +64,10 @@ public abstract class Level_Master  implements ApplicationListener{
     Texture backgroundTexture;
     Model backgroundModel;
     ModelInstance backgroundInstance;
+    float playerMovement;
 
 
-    abstract void childRender(float delta);
+    abstract void childRender(float delta, int frames);
 
     @Override
     public void create() {
@@ -81,6 +84,7 @@ public abstract class Level_Master  implements ApplicationListener{
         spriteBatch = new SpriteBatch();
         groundArray = new Array<Box>();
         coinArray = new Vector<Coin>();
+        skullArray = new Vector<Skull>();
         powerUpArray = new Vector<PowerUp>();
         enemyVector = new ArrayList<Enemy>();
         modelBatch = new ModelBatch();
@@ -102,7 +106,8 @@ public abstract class Level_Master  implements ApplicationListener{
 
         backgroundInstance = new ModelInstance(backgroundModel);
         instance.add(backgroundInstance);
-
+        movementIllusion=false;
+        forward=true;
     }
 
     public boolean getNextLevel(){
@@ -129,6 +134,14 @@ public abstract class Level_Master  implements ApplicationListener{
         }
     }
 
+    public boolean collisionWithSkull(){
+        boolean bool=false;
+        for(int a=0;a<skullArray.size();a++){
+            bool=bool||skullArray.get(a).detectPlayer(player);
+        }
+        return bool;
+    }
+
     public void collisionWithEndOfLevel(){
         if(endOfLevel.booleanDetectPlayer(player, collisionDetection)){
             nextLevel=true;
@@ -142,6 +155,16 @@ public abstract class Level_Master  implements ApplicationListener{
         cam.update();
         Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 1.f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+    }
+
+    public void backgroundMovement(boolean illusionMovement, float delta, float playerMovement){
+        //System.out.println(playerMovement);
+        backgroundPosition = backgroundPosition+(-delta*3f)+playerMovement;
+        backgroundInstance.transform.setToTranslation(player.getX(), -10f, backgroundPosition);
+    }
+
+    public float getPlayerMovement(){
+        return playerMovement;
     }
 
     public void masterRender(float delta){
@@ -165,11 +188,12 @@ public abstract class Level_Master  implements ApplicationListener{
             player.jump(delta);
         }
 
-        player.horizontalMovement(forward, backwards, rightSide, leftSide, delta);
+        forward=!collisionWithSkull();
+        //System.out.println(forward);
+        playerMovement=player.horizontalMovement(forward, backwards, rightSide, leftSide, delta);
+        
         player.verticalMovement(delta);
-        float poop = player.getZ()*0.9f;
-        System.out.println(poop);
-        backgroundInstance.transform.setToTranslation(player.getX(), -10f, poop);
+        backgroundMovement(false, delta, playerMovement);
         cameraPosition();
 
         modelBatch.begin(cam);
@@ -198,7 +222,7 @@ public abstract class Level_Master  implements ApplicationListener{
             float touchX = Gdx.input.getX();
             float touchY = Gdx.input.getY();
 
-            System.out.println(screenHeight/3 + " " + touchY);
+            //System.out.println(screenHeight/3 + " " + touchY);
             if(touchY < screenHeight/3){
                  movement2=1;
             }else if(touchX > screenWidth/2) {
@@ -251,10 +275,11 @@ public abstract class Level_Master  implements ApplicationListener{
 
     @Override
     public void render() {
+        frames++;
         final float delta = Math.min(1f/30f, Gdx.graphics.getDeltaTime());
         masterInput();
         masterRender(delta);
-        childRender(delta);
+        childRender(delta, frames);
     }
 
     @Override

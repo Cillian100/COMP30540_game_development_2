@@ -62,7 +62,7 @@ public class Level_1 extends Level_Master{
         hasGround=true;
     }
     
-    public void childRender(float delta){
+    public void childRender(float delta, int frames){
         enemy.movementFunction1(-5f, 5f, delta, 3f);
         enemy2.movementFunction1(-5f, 5f, delta, 5f);
     }

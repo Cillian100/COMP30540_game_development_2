@@ -69,7 +69,6 @@ public class CollisionDetection {
     }
 
     public void collisionWithEnemy(Player player, ArrayList<Enemy> enemyVector){
-        //System.out.println(player.getImmunityValue());
         for(int a=0;a<enemyVector.size();a++){
             if(checkCollision(player.getObject(), enemyVector.get(a).getObject()) && player.getImmunity()==true){
                 player.reduceHealth();

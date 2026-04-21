@@ -4,7 +4,7 @@ data/arial.ttf
 data/endOfLevel.mtl
 data/endOfLevel.obj
 data/ship.obj
-data/skullgoon.obj
+data/skull.obj
 level_1.png
 level_2.png
 level_3.png

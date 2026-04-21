@@ -105,15 +105,8 @@ public class Player extends Box{
         movementSpeed=-5;
     }
 
-    public void horizontalMovement(boolean forward, boolean backwards, boolean rightSide, boolean leftSide, float delta){
-        if(movementSpeed<10){
-            movementSpeed=movementSpeed+0.1f;
-        }
-        if(powerUpValue>0){
-            powerUpSpeed=2;
-        }else{
-            powerUpSpeed=1;
-        }
+    public float horizontalMovement(boolean forward, boolean backwards, boolean rightSide, boolean leftSide, float delta){
+        float movement=0;
 
         if(rightSide==true){
             move(0f, 0f, delta*10);
@@ -123,7 +116,22 @@ public class Player extends Box{
             move(0f, 0f, -delta*10);
         }
 
-        move(delta*movementSpeed*powerUpSpeed, 0f, 0f);
+        if(forward==true){
+            if(movementSpeed<10){
+                movementSpeed=movementSpeed+0.1f;
+            }
+            if(powerUpValue>0){
+                powerUpSpeed=2;
+            }else{
+                powerUpSpeed=1;
+            }
+
+            movement=delta*movementSpeed*powerUpSpeed;
+
+            move(movement, 0f, 0f);
+        }
+
+        return movement;
     }
 
     public void verticalMovement(float delta){
