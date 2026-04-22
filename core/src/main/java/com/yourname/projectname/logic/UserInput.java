@@ -96,7 +96,7 @@ public class UserInput {
             float boxH = boxes[a][3];
 
             if (touchX > boxX && touchX < boxX + boxW && touchY > boxY && touchY < boxY + boxH) {
-
+                System.out.println(a);
                 return a;
             }
         }

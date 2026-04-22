@@ -114,6 +114,7 @@ public class StartingScreen implements ApplicationListener{
 
         if(loadLevel){
             currentLevel=userInput.loadOpenLevel(justOpenedLoadMenu, currentLevel, menuPosition2);
+            System.out.println("current level " + currentLevel);
         }
 
         justOpenedLoadMenu=false;

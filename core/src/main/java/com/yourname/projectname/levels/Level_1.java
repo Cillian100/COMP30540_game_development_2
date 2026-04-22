@@ -60,10 +60,15 @@ public class Level_1 extends Level_Master{
         hasPowerUp=true;
         hasEnemy=true;
         hasGround=true;
+        hasSkull=false;
     }
     
     public void childRender(float delta, int frames){
         enemy.movementFunction1(-5f, 5f, delta, 3f);
         enemy2.movementFunction1(-5f, 5f, delta, 5f);
+    }
+
+    public void childTextRender(){
+        
     }
 }

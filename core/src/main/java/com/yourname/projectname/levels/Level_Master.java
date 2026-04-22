@@ -22,13 +22,8 @@ import com.badlogic.gdx.physics.bullet.collision.btDispatcher;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.yourname.projectname.logic.CollisionDetection;
-import com.yourname.projectname.entities.Box;
-import com.yourname.projectname.entities.Coin;
-import com.yourname.projectname.entities.EndOfLevel;
-import com.yourname.projectname.entities.Enemy;
-import com.yourname.projectname.entities.Player;
-import com.yourname.projectname.entities.Skull;
-import com.yourname.projectname.entities.PowerUp;import com.yourname.projectname.logic.UserInput;
+import com.yourname.projectname.entities.*;
+import com.yourname.projectname.logic.UserInput;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -39,7 +34,7 @@ public abstract class Level_Master  implements ApplicationListener{
     Array<Box> groundArray;
     BitmapFont font;
     boolean forward, backwards, leftSide, rightSide, jump, groundCollision, endOfLevelCollision, currentCollision, nextLevel;
-    boolean hasCoins, hasEndOfLevel, hasPowerUp, hasEnemy, hasGround, movementIllusion;
+    boolean hasCoins, hasEndOfLevel, hasPowerUp, hasEnemy, hasGround, hasBullets, hasSkull, movementIllusion, bossFight;
     boolean created=false;
     btCollisionConfiguration collisionConfig;
     btDispatcher dispatcher;
@@ -58,6 +53,7 @@ public abstract class Level_Master  implements ApplicationListener{
     Vector<Coin> coinArray;
     Vector<Skull> skullArray;
     Vector<PowerUp> powerUpArray;
+    ArrayList<BulletEntity> bulletVec;
     ArrayList<Enemy> enemyVector;
     UserInput userInput;
     OrthographicCamera hudCam;
@@ -65,9 +61,11 @@ public abstract class Level_Master  implements ApplicationListener{
     Model backgroundModel;
     ModelInstance backgroundInstance;
     float playerMovement;
+    Skull skull;
 
 
     abstract void childRender(float delta, int frames);
+    abstract void childTextRender();
 
     @Override
     public void create() {
@@ -78,24 +76,22 @@ public abstract class Level_Master  implements ApplicationListener{
         instance = new Vector<ModelInstance>();
         instance.add(player.getModel());
         font = new BitmapFont();
-        //viewport = new FitViewport(20, 20, cam);
         hudCam = new OrthographicCamera();
-        viewport = new FitViewport(9, 16, hudCam);
+        hudCam.setToOrtho(false, 280, 270);
+        viewport = new FitViewport(280, 270, hudCam);
         spriteBatch = new SpriteBatch();
         groundArray = new Array<Box>();
         coinArray = new Vector<Coin>();
         skullArray = new Vector<Skull>();
         powerUpArray = new Vector<PowerUp>();
         enemyVector = new ArrayList<Enemy>();
+        bulletVec = new ArrayList<BulletEntity>();
         modelBatch = new ModelBatch();
         enviroment = new Environment();
         enviroment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         enviroment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
-        font.getData().setScale(viewport.getWorldHeight() / 8);
         groundLevel=0;
-        created=true;
         collisionDetection = new CollisionDetection();
-        nextLevel=false;
         userInput = new UserInput();
         backgroundTexture = new Texture("background.png");
         ModelBuilder mb = new ModelBuilder();
@@ -108,20 +104,13 @@ public abstract class Level_Master  implements ApplicationListener{
         instance.add(backgroundInstance);
         movementIllusion=false;
         forward=true;
+        bossFight=false;
+        nextLevel=false;
+        created=true;
     }
 
     public boolean getNextLevel(){
         return nextLevel;
-    }
-
-    public void collisionWithCoin(){
-        for(int a=0;a<coinArray.size();a++){
-            if(coinArray.get(a).booleanDetectPlayer(player, collisionDetection)){
-                score=score+10;
-                instance.remove(coinArray.get(a).getModel());
-                coinArray.remove(a);
-            }
-        }
     }
 
     public void collisionWithPowerUp(){
@@ -149,8 +138,9 @@ public abstract class Level_Master  implements ApplicationListener{
     }
 
     public void cameraPosition(){
+        groundLevel=player.getGroundLevel();
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        cam.position.set(player.getX(), 10f, player.getZ()-10);
+        cam.position.set(player.getX(), groundLevel+10, player.getZ()-10);
         cam.lookAt(player.getX(), groundLevel, player.getZ());
         cam.update();
         Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 1.f);
@@ -158,7 +148,6 @@ public abstract class Level_Master  implements ApplicationListener{
     }
 
     public void backgroundMovement(boolean illusionMovement, float delta, float playerMovement){
-        //System.out.println(playerMovement);
         backgroundPosition = backgroundPosition+(-delta*3f)+playerMovement;
         backgroundInstance.transform.setToTranslation(player.getX(), -10f, backgroundPosition);
     }
@@ -168,8 +157,9 @@ public abstract class Level_Master  implements ApplicationListener{
     }
 
     public void masterRender(float delta){
+        forward=true;
         if(hasCoins==true){
-            collisionWithCoin();
+            score=score+collisionDetection.collisionWithCoinAndPlayer(player, coinArray, instance);
         }
         if(hasGround==true){
             groundCollision=collisionDetection.collisionWithGround(player, groundArray, delta);
@@ -181,16 +171,23 @@ public abstract class Level_Master  implements ApplicationListener{
             collisionWithEndOfLevel();
         }
         if(hasEnemy==true){
-            collisionDetection.collisionWithEnemy(player, enemyVector);
+            collisionDetection.collisionWithEnemy(player, enemyVector, instance);
+        }
+        if(hasBullets==true){
+            collisionDetection.collisionWithBullets(player, bulletVec, instance);
+        }
+        if(hasSkull==true){
+            collisionDetection.collisionWithBulletsAndSkull(skull, player.getBullets(), instance);
+            bossFight=collisionWithSkull();
+            forward=!bossFight;
         }
 
         if(groundCollision==true && jump==true){
             player.jump(delta);
         }
 
-        forward=!collisionWithSkull();
-        //System.out.println(forward);
         playerMovement=player.horizontalMovement(forward, backwards, rightSide, leftSide, delta);
+        player.moveBullets(delta);
         
         player.verticalMovement(delta);
         backgroundMovement(false, delta, playerMovement);
@@ -199,8 +196,10 @@ public abstract class Level_Master  implements ApplicationListener{
         modelBatch.begin(cam);
         modelBatch.render(instance, enviroment);
         modelBatch.end();
+    }
 
-        viewport.apply();
+    public void textRender(float delta){
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         spriteBatch.setProjectionMatrix(hudCam.combined);
         spriteBatch.begin();
 
@@ -208,9 +207,10 @@ public abstract class Level_Master  implements ApplicationListener{
             player.powerUpDecrease(delta);
         }
 
-        font.draw(spriteBatch, "Score: " + score, 10, Gdx.graphics.getHeight() - 10);
-        font.draw(spriteBatch, "Health: " + (int)player.getHealth(), 10, Gdx.graphics.getHeight() - 50);
-        font.draw(spriteBatch, "Power Up: " + (int)player.getPowerUpValue(), 10, Gdx.graphics.getHeight() - 90);
+        font.draw(spriteBatch, "Score: " + score, 30, 250);
+        font.draw(spriteBatch, "Health: " + (int)player.getHealth(), 30, 230);
+        font.draw(spriteBatch, "Power up: " + (int)player.getPowerUpValue(), 30, 210);
+        childTextRender();
         spriteBatch.end();
     }
 
@@ -222,7 +222,6 @@ public abstract class Level_Master  implements ApplicationListener{
             float touchX = Gdx.input.getX();
             float touchY = Gdx.input.getY();
 
-            //System.out.println(screenHeight/3 + " " + touchY);
             if(touchY < screenHeight/3){
                  movement2=1;
             }else if(touchX > screenWidth/2) {
@@ -262,6 +261,10 @@ public abstract class Level_Master  implements ApplicationListener{
         }else{
             jump=false;
         }
+
+        if(Gdx.input.isKeyPressed(Keys.W)){
+            player.shoot(instance, frames);
+        }
     }
 
     public boolean getCreated(){
@@ -270,7 +273,7 @@ public abstract class Level_Master  implements ApplicationListener{
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
+        hudCam.setToOrtho(false, 480, 270);
     }
 
     @Override
@@ -279,6 +282,7 @@ public abstract class Level_Master  implements ApplicationListener{
         final float delta = Math.min(1f/30f, Gdx.graphics.getDeltaTime());
         masterInput();
         masterRender(delta);
+        textRender(delta);
         childRender(delta, frames);
     }
 

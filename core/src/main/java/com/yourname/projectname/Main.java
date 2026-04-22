@@ -116,12 +116,21 @@ public class Main implements ApplicationListener{
         if(currentLevel==0){
             startingScreenFunction(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         }
+        
         if(currentLevel==1){
             level1();
-
         }
+        
         if(currentLevel==2){
             level2();
+        }
+
+        if(currentLevel==3){
+            level3();
+        }
+
+        if(currentLevel==4){
+            level4();
         }
     }
 
