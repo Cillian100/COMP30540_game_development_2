@@ -6,11 +6,13 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Model;import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
@@ -29,6 +31,8 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
+
 
 public abstract class Level_Master  implements ApplicationListener{
     Array<Box> groundArray;
@@ -43,7 +47,7 @@ public abstract class Level_Master  implements ApplicationListener{
     EndOfLevel endOfLevel;
     Environment enviroment;
     FitViewport viewport;
-    float groundLevel, upwardsMomentum, powerUp=0, backgroundPosition=0;
+    float groundLevel, upwardsMomentum, powerUp=0, backgroundPositionX=0, backgroundPositionZ=0;
     int health=0, score=0, frames=0;
     PerspectiveCamera cam;
     ModelBatch modelBatch;
@@ -62,16 +66,20 @@ public abstract class Level_Master  implements ApplicationListener{
     ModelInstance backgroundInstance;
     float playerMovement;
     Skull skull;
+    int direction;
 
 
     abstract void childRender(float delta, int frames);
     abstract void childTextRender();
+    abstract int changeDirection(Player player, CollisionDetection collision);
 
     @Override
     public void create() {
         Bullet.init();
         player = new Player(0f, 4f, 0f, 1f, 1f, 1f);
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam.near = 0.1f;
+        cam.far = 1000f;
 		cam.update();
         instance = new Vector<ModelInstance>();
         instance.add(player.getModel());
@@ -93,12 +101,25 @@ public abstract class Level_Master  implements ApplicationListener{
         groundLevel=0;
         collisionDetection = new CollisionDetection();
         userInput = new UserInput();
-        backgroundTexture = new Texture("background.png");
+        backgroundTexture = new Texture("back_ground.png");
         ModelBuilder mb = new ModelBuilder();
 
-        backgroundModel = mb.createBox(100f, 0.1f, 200f,
-            new Material(TextureAttribute.createDiffuse(backgroundTexture)),
-            Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+        //backgroundModel = mb.createBox(600f, 0.1f, 600f,
+        //    new Material(TextureAttribute.createDiffuse(backgroundTexture)),
+        //    Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+
+        backgroundModel = mb.createRect(
+            -400f, 0f,  400f,
+            400f, 0f,  400f,
+            400f, 0f, -400f,
+            -400f, 0f, -400f,
+            0f, 1f, 0f,
+            new Material(
+                TextureAttribute.createDiffuse(backgroundTexture),
+                IntAttribute.createCullFace(GL20.GL_NONE)  // render both sides
+            ),
+            Usage.Position | Usage.Normal | Usage.TextureCoordinates
+        );
 
         backgroundInstance = new ModelInstance(backgroundModel);
         instance.add(backgroundInstance);
@@ -138,9 +159,15 @@ public abstract class Level_Master  implements ApplicationListener{
     }
 
     public void cameraPosition(){
-        groundLevel=player.getGroundLevel();
+        groundLevel = player.getGroundLevel();
+        if(direction==1){
+            cam.position.set(player.getX(), groundLevel+10, player.getZ()-10);
+        }
+        if(direction==2){
+            cam.position.set(player.getX()-10, groundLevel+10, player.getZ());
+        }
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        cam.position.set(player.getX(), groundLevel+10, player.getZ()-10);
+        cam.up.set(0, 1, 0);
         cam.lookAt(player.getX(), groundLevel, player.getZ());
         cam.update();
         Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 1.f);
@@ -148,8 +175,15 @@ public abstract class Level_Master  implements ApplicationListener{
     }
 
     public void backgroundMovement(boolean illusionMovement, float delta, float playerMovement){
-        backgroundPosition = backgroundPosition+(-delta*3f)+playerMovement;
-        backgroundInstance.transform.setToTranslation(player.getX(), -10f, backgroundPosition);
+        backgroundPositionX = backgroundPositionX + (-delta * 3f) + playerMovement;
+        backgroundPositionZ = backgroundPositionZ + (-delta * 3f) + playerMovement;
+
+        if(direction==1){
+            backgroundInstance.transform.setToTranslation(player.getX(), -20f, backgroundPositionZ);
+        }
+        if(direction==2){
+            backgroundInstance.transform.setToTranslation(backgroundPositionX, -20f, player.getZ());
+        }
     }
 
     public float getPlayerMovement(){
@@ -186,7 +220,9 @@ public abstract class Level_Master  implements ApplicationListener{
             player.jump(delta);
         }
 
-        playerMovement=player.horizontalMovement(forward, backwards, rightSide, leftSide, delta);
+
+        playerMovement=player.horizontalMovement(forward, backwards, rightSide, leftSide, delta, direction);
+
         player.moveBullets(delta);
         
         player.verticalMovement(delta);
@@ -284,6 +320,7 @@ public abstract class Level_Master  implements ApplicationListener{
         masterRender(delta);
         textRender(delta);
         childRender(delta, frames);
+        direction=changeDirection(player, collisionDetection);
     }
 
     @Override

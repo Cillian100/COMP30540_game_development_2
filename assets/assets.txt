@@ -1,5 +1,7 @@
 TheWorld.png
+back_ground.png
 background.png
+background2.png
 data/arial.ttf
 data/endOfLevel.mtl
 data/endOfLevel.obj

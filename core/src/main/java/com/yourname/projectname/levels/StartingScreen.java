@@ -43,7 +43,6 @@ public class StartingScreen implements ApplicationListener{
         camera = new OrthographicCamera();
         batch = new SpriteBatch();
         font = new BitmapFont();
-        //viewport = new FitViewport(20, 20, camera);
         font.setUseIntegerPositions(false);
         backgroundTexture = new Texture("background.png");
         level_1 = new Texture("level_1.png");

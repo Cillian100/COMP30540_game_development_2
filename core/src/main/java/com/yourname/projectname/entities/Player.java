@@ -135,32 +135,67 @@ public class Player extends Box{
         movementSpeed=-5;
     }
 
-    public float horizontalMovement(boolean forward, boolean backwards, boolean rightSide, boolean leftSide, float delta){
+    public void rotateModel(int direction, float x_2, float y_2, float z_2){
+        if(direction==1){
+            myModel.transform.setToTranslation(x_2, y_2, z_2).rotate(Vector3.Y, 270);
+        }
+
+        if(direction==2){
+            myModel.transform.setToTranslation(x_2, y_2, z_2).rotate(Vector3.Y, 0);
+        }
+    }
+
+    public float horizontalMovement(boolean forward, boolean backwards, boolean rightSide, boolean leftSide, float delta, int direction){
         float movement=0;
-
-        if(rightSide==true){
-            move(0f, 0f, delta*10);
-        }
-
-        if(leftSide==true){
-            move(0f, 0f, -delta*10);
-        }
-
-        if(forward==true){
-            if(movementSpeed<10){
-                movementSpeed=movementSpeed+0.1f;
-            }
-            if(powerUpValue>0){
-                powerUpSpeed=2;
-            }else{
-                powerUpSpeed=1;
+        
+        if(true){
+            if(rightSide==true){
+                move(0f, 0f, delta*10);
             }
 
-            movement=delta*movementSpeed*powerUpSpeed;
+            if(leftSide==true){
+                move(0f, 0f, -delta*10);
+            }
 
-            move(movement, 0f, 0f);
+            if(forward==true){
+                if(movementSpeed<10){
+                    movementSpeed=movementSpeed+0.1f;
+                }
+                if(powerUpValue>0){
+                    powerUpSpeed=2;
+                }else{
+                    powerUpSpeed=1;
+                }
+
+                movement=delta*movementSpeed*powerUpSpeed;
+
+                move(movement, 0f, 0f);
+            }
         }
 
+        if(!true){
+            if(rightSide==true){
+                move(delta*10, 0f, 0f);
+            }
+            if(leftSide==true){
+                move(-delta*10, 0f, 0f);
+            }
+
+            if(forward==true){
+                if(movementSpeed<10){
+                    movementSpeed=movementSpeed+0.1f;
+                }
+                if(powerUpValue>0){
+                    powerUpSpeed=2;
+                }else{
+                    powerUpSpeed=1;
+                }
+
+                movement=delta*movementSpeed*powerUpSpeed;
+
+                move(0f, 0f, -movement);
+            }
+        }
         return movement;
     }
 

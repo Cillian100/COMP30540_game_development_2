@@ -9,6 +9,9 @@ import com.yourname.projectname.entities.Coin;
 import com.yourname.projectname.entities.EndOfLevel;
 import com.yourname.projectname.entities.Enemy;
 import com.yourname.projectname.entities.PowerUp;
+import com.yourname.projectname.entities.Player;
+import com.yourname.projectname.logic.CollisionDetection;
+
 
 public class Level_1 extends Level_Master{
     ModelInstance ground;
@@ -68,7 +71,10 @@ public class Level_1 extends Level_Master{
         enemy2.movementFunction1(-5f, 5f, delta, 5f);
     }
 
-    public void childTextRender(){
-        
+    public void childTextRender(){   
+    }
+
+    public int changeDirection(Player player, CollisionDetection collision){
+        return 1;
     }
 }

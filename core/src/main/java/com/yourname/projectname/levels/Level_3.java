@@ -3,6 +3,8 @@ package com.yourname.projectname.levels;
 import com.yourname.projectname.entities.Box;
 import com.yourname.projectname.entities.EndOfLevel;
 import com.yourname.projectname.entities.Coin;
+import com.yourname.projectname.entities.Player;
+import com.yourname.projectname.logic.CollisionDetection;
 import java.util.Vector;
 
 public class Level_3 extends Level_Master{
@@ -59,6 +61,9 @@ public class Level_3 extends Level_Master{
     }
 
     public void childTextRender(){
+    }
 
+    public int changeDirection(Player player, CollisionDetection collision){
+        return 1;
     }
 }

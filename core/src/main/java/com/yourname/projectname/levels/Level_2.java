@@ -4,6 +4,8 @@ import com.yourname.projectname.entities.Box;
 import com.yourname.projectname.entities.Skull;
 import com.yourname.projectname.entities.BulletEntity;
 import com.yourname.projectname.entities.EndOfLevel;
+import com.yourname.projectname.logic.CollisionDetection;
+import com.yourname.projectname.entities.Player;
 import java.util.Vector;
 
 public class Level_2 extends Level_Master{
@@ -73,5 +75,9 @@ public class Level_2 extends Level_Master{
             instance.add(bulletVec.get(counter).getModel());
             counter++;
         }
+    }
+
+    public int changeDirection(Player player, CollisionDetection collision){
+        return 1;
     }
 }
