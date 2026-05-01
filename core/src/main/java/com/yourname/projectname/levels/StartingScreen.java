@@ -65,10 +65,10 @@ public class StartingScreen implements ApplicationListener{
         height=16;
         userInput = new UserInput();
         boxes = new float[4][4];
-        boxes[0] = new float[]{2, 5, 2, 2};
-        boxes[1] = new float[]{5, 5, 2, 2};
-        boxes[2] = new float[]{2, 2, 2, 2};
-        boxes[3] = new float[]{5, 2, 2, 2};
+        boxes[0] = new float[]{2, 12, 2, 2};
+        boxes[1] = new float[]{2, 9, 2, 2};
+        boxes[2] = new float[]{2, 6, 2, 2};
+        boxes[3] = new float[]{2, 3, 2, 2};
     }
 
     public boolean getCreated(){
@@ -185,9 +185,17 @@ public class StartingScreen implements ApplicationListener{
             if(menuPosition2==3){
                 drawer.filledRectangle(boxes[3][0]-0.1f, boxes[3][1]-0.1f, boxes[3][2]+0.2f, boxes[3][3]+0.2f);
             }
+            font.getData().setScale(viewport.getWorldHeight() / 300);
+            font.draw(batch, "Level 1", boxes[0][0], boxes[0][1]+2.8f);
             batch.draw(level_1, boxes[0][0], boxes[0][1], boxes[0][2], boxes[0][3]);
+
+            font.draw(batch, "Level 2", boxes[1][0], boxes[1][1]+2.8f);
             batch.draw(level_2, boxes[1][0], boxes[1][1], boxes[1][2], boxes[1][3]);
+
+            font.draw(batch, "Level 3", boxes[2][0], boxes[2][1]+2.8f);
             batch.draw(level_3, boxes[2][0], boxes[2][1], boxes[2][2], boxes[2][3]);
+
+            font.draw(batch, "Level 4", boxes[3][0], boxes[3][1]+2.8f);
             batch.draw(level_4, boxes[3][0], boxes[3][1], boxes[3][2], boxes[3][3]);
         }
         batch.end();

@@ -20,7 +20,7 @@ import com.yourname.projectname.logic.UserInput;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
-public class End_Screen implements ApplicationListener{
+public class Lose_Screen implements ApplicationListener{
     OrthographicCamera camera;
     SpriteBatch batch;
     BitmapFont font;
@@ -55,7 +55,7 @@ public class End_Screen implements ApplicationListener{
         height=16;
         score=0;
         userInput = new UserInput();
-        currentLevel=10;
+        currentLevel=11;
 
         created=true;
     }
@@ -105,12 +105,12 @@ public class End_Screen implements ApplicationListener{
         batch.draw(backgroundTexture, 0, 0, 9, 14);
         font.getData().setScale(viewport.getWorldHeight() / 150);
         font.setColor(Color.WHITE);
-        font.draw(batch, "You Win!", 1.1f, 13.5f);
+        font.draw(batch, "You Lose!", 1.1f, 13.5f);
         font.draw(batch, "Score: " + score, 1.1f, 11f);
         font.getData().setScale(viewport.getWorldHeight() / 350);
         font.draw(batch, "Press Space or Screen\nto Return", 1.1f, 7f);
 
         batch.end();
     }
-    
+
 }

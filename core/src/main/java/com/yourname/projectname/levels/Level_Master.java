@@ -67,6 +67,7 @@ public abstract class Level_Master  implements ApplicationListener{
     float playerMovement;
     Skull skull;
     int direction;
+    boolean dead;
 
 
     abstract void childRender(float delta, int frames);
@@ -104,10 +105,6 @@ public abstract class Level_Master  implements ApplicationListener{
         backgroundTexture = new Texture("back_ground.png");
         ModelBuilder mb = new ModelBuilder();
 
-        //backgroundModel = mb.createBox(600f, 0.1f, 600f,
-        //    new Material(TextureAttribute.createDiffuse(backgroundTexture)),
-        //    Usage.Position | Usage.Normal | Usage.TextureCoordinates);
-
         backgroundModel = mb.createRect(
             -400f, 0f,  400f,
             400f, 0f,  400f,
@@ -128,6 +125,11 @@ public abstract class Level_Master  implements ApplicationListener{
         bossFight=false;
         nextLevel=false;
         created=true;
+        dead=false;
+    }
+
+    public int getScore(){
+        return score;
     }
 
     public boolean getNextLevel(){
@@ -312,6 +314,17 @@ public abstract class Level_Master  implements ApplicationListener{
         hudCam.setToOrtho(false, 480, 270);
     }
 
+    public void fallingOutOfWorld(){
+        if(player.getY()<-5){
+            System.out.println("it's over bro..");
+            dead=true;
+        }
+    }
+
+    public boolean getDead(){
+        return dead;
+    }
+
     @Override
     public void render() {
         frames++;
@@ -321,6 +334,7 @@ public abstract class Level_Master  implements ApplicationListener{
         textRender(delta);
         childRender(delta, frames);
         direction=changeDirection(player, collisionDetection);
+        fallingOutOfWorld();
     }
 
     @Override
